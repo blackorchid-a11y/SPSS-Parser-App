@@ -11,7 +11,8 @@
     "dist:mac": "npm run build && electron-builder --mac",
     "dist:win": "npm run build && electron-builder --win"
   },
-  "build": {
+ "build": {
+    "publish": "never",
     "appId": "com.spss.parser",
     "productName": "SPSS Parser",
     "win": {
