@@ -3,8 +3,6 @@ name: Build Apps
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -24,17 +22,29 @@ jobs:
     - name: Install dependencies
       run: npm ci
       
+    - name: Build Vite app
+      run: npm run build
+      
     - name: Build Mac app
       run: npm run dist:mac
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        DEBUG: electron-builder
+    
+    - name: List release contents
+      if: always()
+      run: |
+        echo "=== Release directory ==="
+        ls -la release/ || echo "No release folder"
+        echo "=== All DMG files ==="
+        find . -name "*.dmg"
       
     - name: Upload Mac app
+      if: success()
       uses: actions/upload-artifact@v4
       with:
         name: mac-app
         path: release/*.dmg
-        if-no-files-found: error
 
   build-windows:
     runs-on: windows-latest
@@ -52,14 +62,27 @@ jobs:
     - name: Install dependencies
       run: npm ci
       
+    - name: Build Vite app
+      run: npm run build
+      
     - name: Build Windows app
       run: npm run dist:win
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        DEBUG: electron-builder
+    
+    - name: List release contents
+      if: always()
+      shell: bash
+      run: |
+        echo "=== Release directory ==="
+        ls -la release/ || echo "No release folder"
+        echo "=== All EXE files ==="
+        find . -name "*.exe"
       
     - name: Upload Windows app
+      if: success()
       uses: actions/upload-artifact@v4
       with:
         name: windows-app
         path: release/*.exe
-        if-no-files-found: error
