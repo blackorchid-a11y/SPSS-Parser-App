@@ -1,0 +1,53 @@
+{
+  "name": "spss-parser-app",
+  "version": "1.0.0",
+  "description": "SPSS Logistic Regression Parser with Forest Plot Generator",
+  "main": "electron.js",
+  "scripts": {
+    "dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && cross-env NODE_ENV=development electron .\"",
+    "build": "vite build",
+    "electron": "electron .",
+    "dist": "npm run build && electron-builder",
+    "dist:mac": "npm run build && electron-builder --mac",
+    "dist:win": "npm run build && electron-builder --win"
+  },
+  "build": {
+    "appId": "com.spss.parser",
+    "productName": "SPSS Parser",
+    "win": {
+      "target": "nsis",
+      "icon": "icon.png"
+    },
+    "mac": {
+      "target": "dmg",
+      "category": "public.app-category.productivity"
+    },
+    "files": [
+      "dist/**/*",
+      "electron.js",
+      "package.json"
+    ],
+    "directories": {
+      "output": "release"
+    }
+  },
+  "keywords": ["SPSS", "Statistics", "Forest Plot"],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "xlsx": "^0.18.5",
+    "papaparse": "^5.4.1",
+    "lucide-react": "^0.263.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.0.0",
+    "vite": "^4.3.9",
+    "electron": "^25.0.0",
+    "electron-builder": "^24.6.3",
+    "concurrently": "^8.2.0",
+    "wait-on": "^7.0.1",
+    "cross-env": "^7.0.3"
+  }
+}

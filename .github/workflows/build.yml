@@ -1,0 +1,55 @@
+name: Build Apps
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-mac:
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        
+    - name: Install dependencies
+      run: npm install
+      
+    - name: Build Mac app
+      run: npm run dist:mac
+      
+    - name: Upload Mac app
+      uses: actions/upload-artifact@v3
+      with:
+        name: mac-app
+        path: release/*.dmg
+
+  build-windows:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        
+    - name: Install dependencies
+      run: npm install
+      
+    - name: Build Windows app
+      run: npm run dist:win
+      
+    - name: Upload Windows app
+      uses: actions/upload-artifact@v3
+      with:
+        name: windows-app
+        path: release/*.exe
