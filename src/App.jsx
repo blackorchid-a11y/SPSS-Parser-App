@@ -42,7 +42,7 @@ export default function SPSSRegressionParser() {
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
       const data = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
 
-      // Find all "Variables en la ecuación" tables and group by model
+      // Find all "Variables in the Equation" / "Variables en la ecuación" tables and group by model
       const modelGroups = [];
       let currentModelSteps = [];
       let lastModelContext = null;
@@ -116,8 +116,18 @@ export default function SPSSRegressionParser() {
             }
           }
           
-          // Check if this has confidence intervals
-          if (headerRow2 && (headerRow2[8] === "Inferior" || headerRow2.includes("Inferior"))) {
+          // Check if this has confidence intervals (Spanish: "Inferior"/"Superior", English: "Lower"/"Upper")
+          // Check for presence of CI column in either column 8 or anywhere in headerRow2
+          const hasCI = headerRow2 && (
+            headerRow2[8] === "Inferior" || 
+            headerRow2[8] === "Lower" || 
+            headerRow2.includes("Inferior") || 
+            headerRow2.includes("Lower") ||
+            headerRow2.includes("Superior") ||
+            headerRow2.includes("Upper")
+          );
+          
+          if (hasCI) {
             const variables = [];
             let stepNumber = null;
             let consecutiveEmptyRows = 0;
@@ -126,9 +136,9 @@ export default function SPSSRegressionParser() {
             for (let j = i + 3; j < Math.min(data.length, i + 200); j++) {
               const varRow = data[j];
               
-              // Check for step number (e.g., "Paso 1", "Paso 2", etc.)
+              // Check for step number (e.g., "Paso 1"/"Step 1", "Paso 2"/"Step 2", etc.)
               // The step number and first variable are IN THE SAME ROW
-              if (varRow[0] && varRow[0].toString().includes("Paso")) {
+              if (varRow[0] && (varRow[0].toString().includes("Paso") || varRow[0].toString().includes("Step"))) {
                 stepNumber = varRow[0].toString().trim();
                 consecutiveEmptyRows = 0; // Reset empty row counter
                 // DO NOT continue - process the variable data in this same row
@@ -147,8 +157,8 @@ export default function SPSSRegressionParser() {
               // Reset empty row counter if we found data
               consecutiveEmptyRows = 0;
               
-              // Skip "Constante"
-              if (varRow[1] === "Constante") {
+              // Skip "Constante" (Spanish) or "Constant" (English)
+              if (varRow[1] === "Constante" || varRow[1] === "Constant") {
                 continue;
               }
               
@@ -160,7 +170,7 @@ export default function SPSSRegressionParser() {
                   lowerCI: varRow[8],
                   upperCI: varRow[9],
                   pValue: varRow[6],
-                  step: stepNumber || 'Paso 1'
+                  step: stepNumber || 'Step 1'
                 });
               }
             }
@@ -168,7 +178,7 @@ export default function SPSSRegressionParser() {
             if (variables.length > 0) {
               currentModelSteps.push({
                 rowStart: i,
-                stepNumber: stepNumber || 'Paso 1',
+                stepNumber: stepNumber || 'Step 1',
                 variables: variables,
                 outcome: outcomeVariable
               });
@@ -918,7 +928,7 @@ export default function SPSSRegressionParser() {
           <h3 className="font-semibold text-gray-800 mb-3">How it works:</h3>
           <ol className="list-decimal list-inside space-y-2 text-sm text-gray-600">
             <li>Upload your SPSS logistic regression output (Excel format)</li>
-            <li>The tool finds all "Variables en la ecuación" tables</li>
+            <li>The tool finds all "Variables in the Equation" / "Variables en la ecuación" tables (supports both English and Spanish SPSS output)</li>
             <li>For stepwise regression, it tracks variables across all steps</li>
             <li>Creates comprehensive tables showing:
               <ul className="list-disc list-inside ml-6 mt-1">

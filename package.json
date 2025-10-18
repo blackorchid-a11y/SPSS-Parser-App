@@ -1,6 +1,6 @@
 {
   "name": "spss-parser-app",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "SPSS Logistic Regression Parser with Forest Plot Generator",
   "main": "electron.js",
   "scripts": {
