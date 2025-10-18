@@ -92,8 +92,8 @@ export default function SPSSRegressionParser() {
           }
         }
         
-        // Look for "Variables en la ecuación" header
-        if (row[0] === "Variables en la ecuación") {
+        // Look for "Variables en la ecuación" (Spanish) or "Variables in the Equation" (English) header
+        if (row[0] === "Variables en la ecuación" || row[0] === "Variables in the Equation") {
           const headerRow1 = data[i + 1];
           const headerRow2 = data[i + 2];
           
